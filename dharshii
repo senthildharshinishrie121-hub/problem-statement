@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AttendWise - Smart Attendance Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-card">
+
+        <div class="logo">AW</div>
+
+        <h1>AttendWise</h1>
+
+        <p class="subtitle">
+            Smart Attendance & Class Planning
+        </p>
+
+        <label>Student Name</label>
+
+        <input
+            type="text"
+            id="studentName"
+            placeholder="Enter your name"
+            value="Sachit"
+        >
+
+        <label>Class Section</label>
+
+        <select id="studentSection">
+            <option>EEE-A</option>
+            <option>EEE-B</option>
+            <option>EEE-C</option>
+            <option>ECE-A</option>
+            <option>ECE-B</option>
+            <option>CSE-A</option>
+            <option>CSE-B</option>
+            <option>MECH-A</option>
+            <option>CIVIL-A</option>
+            <option>AIDS-A</option>
+        </select>
+
+        <button class="login-button" onclick="login()">
+            Enter Dashboard
+        </button>
+
+        <p class="login-info">
+            Semester: 29 Aug 2026 – 29 Nov 2026
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= MAIN APPLICATION ================= -->
+
+<div id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">AW</div>
+
+            <div>
+                <strong>AttendWise</strong>
+                <small>Smart Attendance</small>
+            </div>
+        </div>
+
+        <nav>
+
+            <button class="nav-button active" onclick="showPage('dashboard')">
+                🏠 Dashboard
+            </button>
+
+            <button class="nav-button" onclick="showPage('attendance')">
+                📊 Attendance
+            </button>
+
+            <button class="nav-button" onclick="showPage('planner')">
+                🧮 Attendance Planner
+            </button>
+
+            <button class="nav-button" onclick="showPage('classes')">
+                📚 Upcoming Classes
+            </button>
+
+            <button class="nav-button" onclick="showPage('timetable')">
+                🗓 Timetable
+            </button>
+
+            <button class="nav-button" onclick="showPage('history')">
+                📋 History
+            </button>
+
+        </nav>
+
+        <button class="logout-button" onclick="logout()">
+            🚪 Logout
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+                <h2 id="pageTitle">Dashboard</h2>
+                <p id="welcomeText">Welcome back!</p>
+            </div>
+
+            <div class="profile">
+                <div class="profile-avatar">S</div>
+
+                <div>
+                    <strong id="profileName">Sachit</strong>
+                    <small id="profileSection">EEE-A</small>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboard" class="page">
+
+            <div class="hero">
+
+                <div>
+                    <span class="hero-label">
+                        SMART ATTENDANCE
+                    </span>
+
+                    <h1>
+                        Plan your classes.<br>
+                        Protect your attendance.
+                    </h1>
+
+                    <p>
+                        Know exactly how many classes you can miss
+                        without falling below the required attendance.
+                    </p>
+                </div>
+
+                <div class="hero-icon">
+                    📊
+                </div>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span>Overall Attendance</span>
+                    <strong id="overallAttendance">0%</strong>
+                    <small>Current semester</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Classes Attended</span>
+                    <strong id="totalAttended">0</strong>
+                    <small>So far</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Classes Conducted</span>
+                    <strong id="totalConducted">0</strong>
+                    <small>So far</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>Safe Absences</span>
+                    <strong id="safeAbsences">0</strong>
+                    <small>Before reaching 75%</small>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+                <!-- TODAY -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h3>Today's Classes</h3>
+                            <p id="todayDate"></p>
+                        </div>
+                    </div>
+
+                    <div id="todayClasses"></div>
+
+                </div>
+
+
+                <!-- CHART -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h3>Attendance Overview</h3>
+                            <p>Subject-wise attendance</p>
+                        </div>
+                    </div>
+
+                    <canvas id="attendanceChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- INSIGHTS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>Smart Insights</h3>
+                        <p>Things you should know</p>
+                    </div>
+                </div>
+
+                <div id="insights"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ATTENDANCE ================= -->
+
+        <section id="attendance" class="page hidden">
+
+            <div class="section-heading">
+                <h2>Subject Attendance</h2>
+                <p>Track your attendance subject by subject.</p>
+            </div>
+
+            <div id="attendanceCards" class="subject-grid"></div>
+
+        </section>
+
+
+        <!-- ================= PLANNER ================= -->
+
+        <section id="planner" class="page hidden">
+
+            <div class="section-heading">
+
+                <h2>Attendance Planner</h2>
+
+                <p>
+                    Find out whether you can safely miss a class.
+                </p>
+
+            </div>
+
+
+            <div class="planner-grid">
+
+                <div class="panel">
+
+                    <h3>Select Subject</h3>
+
+                    <select id="plannerSubject"
+                            onchange="updatePlanner()">
+                    </select>
+
+
+                    <h3>Select Number of Classes</h3>
+
+                    <input
+                        type="number"
+                        id="plannerClasses"
+                        value="1"
+                        min="1"
+                        max="20"
+                        onchange="updatePlanner()"
+                    >
+
+                </div>
+
+
+                <div id="plannerResult" class="planner-result">
+
+                    <h2>Select a subject</h2>
+
+                    <p>
+                        Your attendance calculation will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECOVERY -->
+
+            <div class="panel recovery-panel">
+
+                <h3>Attendance Recovery Planner</h3>
+
+                <p>
+                    If your attendance is below 75%, see how many
+                    consecutive classes you need to attend.
+                </p>
+
+                <div id="recoveryResult"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= UPCOMING CLASSES ================= -->
+
+        <section id="classes" class="page hidden">
+
+            <div class="section-heading">
+
+                <h2>Upcoming Classes</h2>
+
+                <p>
+                    Your upcoming timetable.
+                </p>
+
+            </div>
+
+            <div id="upcomingClasses"></div>
+
+        </section>
+
+
+        <!-- ================= TIMETABLE ================= -->
+
+        <section id="timetable" class="page hidden">
+
+            <div class="section-heading">
+
+                <h2>Weekly Timetable</h2>
+
+                <p>
+                    Section timetable
+                </p>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Faculty</th>
+                            <th>Room</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="timetableBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= HISTORY ================= -->
+
+        <section id="history" class="page hidden">
+
+            <div class="section-heading">
+
+                <h2>Attendance History</h2>
+
+                <p>
+                    Recent attendance records.
+                </p>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="historyBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+/* ================= GENERAL ================= */
+
+.hidden {
+    display: none !important;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+
+/* ================= LOGIN ================= */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+.login-card {
+    width: 400px;
+    max-width: 90%;
+
+    background: white;
+    padding: 40px;
+
+    border-radius: 24px;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+
+    color: white;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    border-radius: 18px;
+
+    margin-bottom: 20px;
+}
+
+.login-card h1 {
+    font-size: 32px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin: 8px 0 30px;
+}
+
+.login-card label {
+    display: block;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    margin: 18px 0 7px;
+}
+
+.login-card input,
+.login-card select,
+.planner-grid input,
+.planner-grid select {
+
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d9deea;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: white;
+}
+
+.login-card input:focus,
+.login-card select:focus,
+.planner-grid input:focus,
+.planner-grid select:focus {
+    border-color: #4f46e5;
+}
+
+.login-button {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 10px;
+
+    margin-top: 25px;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    background: #4f46e5;
+
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background: #4338ca;
+}
+
+.login-info {
+    text-align: center;
+
+    margin-top: 20px;
+
+    font-size: 12px;
+
+    color: #8a93a5;
+}
+
+
+/* ================= APP ================= */
+
+.app {
+    min-height: 100vh;
+}
+
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 250px;
+    height: 100vh;
+
+    background: #111827;
+
+    color: white;
+
+    padding: 25px 15px;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 10;
+}
+
+.brand {
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px;
+
+    margin-bottom: 35px;
+}
+
+.brand-logo {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #4f46e5;
+
+    font-weight: bold;
+}
+
+.brand strong {
+    display: block;
+}
+
+.brand small {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.nav-button {
+
+    width: 100%;
+
+    border: none;
+
+    background: transparent;
+
+    color: #b9c0ce;
+
+    text-align: left;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.nav-button:hover {
+    background: #1f2937;
+    color: white;
+}
+
+.nav-button.active {
+    background: #4f46e5;
+    color: white;
+}
+
+.logout-button {
+
+    margin-top: auto;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #1f2937;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background: #374151;
+}
+
+
+/* ================= MAIN ================= */
+
+.main-content {
+
+    margin-left: 250px;
+
+    padding: 30px;
+
+    min-height: 100vh;
+}
+
+.topbar {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.topbar h2 {
+    font-size: 24px;
+}
+
+.topbar p {
+    color: #7a8395;
+
+    margin-top: 4px;
+}
+
+.profile {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.profile-avatar {
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #4f46e5;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+.profile small {
+    display: block;
+
+    color: #7a8395;
+
+    margin-top: 3px;
+}
+
+
+/* ================= HERO ================= */
+
+.hero {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 35px;
+
+    border-radius: 22px;
+
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #7c3aed
+    );
+
+    color: white;
+
+    margin-bottom: 25px;
+}
+
+.hero-label {
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.8;
+}
+
+.hero h1 {
+
+    font-size: 32px;
+
+    line-height: 1.2;
+
+    margin: 12px 0;
+}
+
+.hero p {
+
+    max-width: 600px;
+
+    opacity: 0.85;
+
+    line-height: 1.6;
+}
+
+.hero-icon {
+
+    font-size: 80px;
+
+    opacity: 0.85;
+}
+
+
+/* ================= STATS ================= */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+.stat-card {
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 16px;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.stat-card span {
+
+    color: #747e90;
+
+    font-size: 13px;
+}
+
+.stat-card strong {
+
+    display: block;
+
+    font-size: 30px;
+
+    margin: 8px 0;
+}
+
+.stat-card small {
+
+    color: #9aa2b1;
+}
+
+
+/* ================= PANELS ================= */
+
+.panel {
+
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+
+    margin-bottom: 22px;
+}
+
+.panel-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.panel-header h3 {
+    margin-bottom: 5px;
+}
+
+.panel-header p {
+
+    color: #858e9f;
+
+    font-size: 13px;
+}
+
+
+/* ================= DASHBOARD GRID ================= */
+
+.dashboard-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 22px;
+}
+
+
+/* ================= CLASS ITEMS ================= */
+
+.class-item {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 14px;
+
+    border: 1px solid #edf0f5;
+
+    border-radius: 12px;
+
+    margin-bottom: 10px;
+}
+
+.class-info strong {
+    display: block;
+}
+
+.class-info small {
+    color: #7e8797;
+}
+
+.class-time {
+
+    font-weight: bold;
+
+    color: #4f46e5;
+
+    font-size: 13px;
+}
+
+
+/* ================= SUBJECT CARDS ================= */
+
+.subject-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+.subject-card {
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.subject-card h3 {
+
+    margin-bottom: 5px;
+}
+
+.subject-card .faculty {
+
+    color: #7d8696;
+
+    font-size: 13px;
+
+    margin-bottom: 18px;
+}
+
+.attendance-number {
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+.progress {
+
+    height: 8px;
+
+    background: #edf0f5;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.progress-bar {
+
+    height: 100%;
+
+    border-radius: 10px;
+}
+
+.subject-details {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 12px;
+
+    font-size: 13px;
+
+    color: #727c8f;
+}
+
+
+/* ================= STATUS ================= */
+
+.status {
+
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+.safe {
+
+    color: #047857;
+
+    background: #d1fae5;
+}
+
+.warning {
+
+    color: #b45309;
+
+    background: #fef3c7;
+}
+
+.danger {
+
+    color: #b91c1c;
+
+    background: #fee2e2;
+}
+
+
+/* ================= SECTION HEADING ================= */
+
+.section-heading {
+
+    margin-bottom: 22px;
+}
+
+.section-heading h2 {
+
+    font-size: 26px;
+
+    margin-bottom: 5px;
+}
+
+.section-heading p {
+
+    color: #7d8797;
+}
+
+
+/* ================= PLANNER ================= */
+
+.planner-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 22px;
+
+    margin-bottom: 22px;
+}
+
+.planner-grid h3 {
+
+    margin: 15px 0 8px;
+}
+
+.planner-grid h3:first-child {
+    margin-top: 0;
+}
+
+.planner-result {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.planner-result h2 {
+    margin-bottom: 10px;
+}
+
+.result-number {
+
+    font-size: 48px;
+
+    font-weight: bold;
+
+    margin: 15px 0;
+}
+
+.result-message {
+
+    font-size: 16px;
+
+    line-height: 1.6;
+}
+
+.recovery-panel {
+
+    margin-top: 20px;
+}
+
+.recovery-box {
+
+    padding: 20px;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    margin-top: 15px;
+}
+
+
+/* ================= INSIGHTS ================= */
+
+.insight {
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border-radius: 12px;
+
+    margin-bottom: 10px;
+}
+
+.insight-icon {
+
+    font-size: 20px;
+}
+
+
+/* ================= TABLE ================= */
+
+.table-container {
+
+    background: white;
+
+    border-radius: 18px;
+
+    overflow-x: auto;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 700px;
+}
+
+th {
+
+    background: #f8fafc;
+
+    text-align: left;
+
+    padding: 15px;
+
+    font-size: 13px;
+
+    color: #687386;
+}
+
+td {
+
+    padding: 15px;
+
+    border-top: 1px solid #edf0f5;
+
+    font-size: 14px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 1000px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .subject-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .dashboard-grid,
+    .planner-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media(max-width: 700px) {
+
+    .sidebar {
+
+        width: 70px;
+
+        padding: 15px 8px;
+    }
+
+    .brand div:not(.brand-logo),
+    .nav-button {
+        font-size: 0;
+    }
+
+    .nav-button::first-letter {
+        font-size: 20px;
+    }
+
+    .logout-button {
+        font-size: 0;
+    }
+
+    .main-content {
+
+        margin-left: 70px;
+
+        padding: 15px;
+    }
+
+    .stats-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .subject-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+
+        padding: 25px;
+    }
+
+    .hero h1 {
+
+        font-size: 24px;
+    }
+
+    .hero-icon {
+        display: none;
+    }
+
+    .profile div:last-child {
+        display: none;
+    }
+
+}/* =====================================================
+   ATTENDWISE
+   Smart Attendance Dashboard
+   ===================================================== */
+
+
+/* ================= SETTINGS ================= */
+
+const REQUIRED_ATTENDANCE = 75;
+
+const semesterStart =
+    new Date("2026-08-29");
+
+const semesterEnd =
+    new Date("2026-11-29");
+
+
+/* ================= STUDENT ================= */
+
+let student = {
+    name: "Sachit",
+    section: "EEE-A"
+};
+
+
+/* ================= SUBJECT DATA ================= */
+
+const subjects = [
+
+    {
+        name: "Engineering Mathematics",
+        short: "Maths",
+        attended: 18,
+        conducted: 21,
+        faculty: "Dr. Kumar"
+    },
+
+    {
+        name: "Engineering Physics",
+        short: "Physics",
+        attended: 15,
+        conducted: 20,
+        faculty: "Dr. Priya"
+    },
+
+    {
+        name: "Basic Electrical Engineering",
+        short: "BEE",
+        attended: 19,
+        conducted: 22,
+        faculty: "Mr. Arun"
+    },
+
+    {
+        name: "Engineering Chemistry",
+        short: "Chemistry",
+        attended: 17,
+        conducted: 19,
+        faculty: "Dr. Meena"
+    },
+
+    {
+        name: "Programming in C",
+        short: "Programming",
+        attended: 16,
+        conducted: 19,
+        faculty: "Mr. Ravi"
+    },
+
+    {
+        name: "English",
+        short: "English",
+        attended: 20,
+        conducted: 21,
+        faculty: "Ms. Anitha"
+    }
+
+];
+
+
+/* ================= TIMETABLE ================= */
+
+const timetable = [
+
+    {
+        day: "Monday",
+        time: "09:00 - 10:00",
+        subject: "Engineering Mathematics",
+        faculty: "Dr. Kumar",
+        room: "A101"
+    },
+
+    {
+        day: "Monday",
+        time: "10:00 - 11:00",
+        subject: "Engineering Physics",
+        faculty: "Dr. Priya",
+        room: "A102"
+    },
+
+    {
+        day: "Monday",
+        time: "11:15 - 12:15",
+        subject: "Basic Electrical Engineering",
+        faculty: "Mr. Arun",
+        room: "EEE Lab"
+    },
+
+    {
+        day: "Tuesday",
+        time: "09:00 - 10:00",
+        subject: "Programming in C",
+        faculty: "Mr. Ravi",
+        room: "Computer Lab"
+    },
+
+    {
+        day: "Tuesday",
+        time: "10:00 - 11:00",
+        subject: "Engineering Chemistry",
+        faculty: "Dr. Meena",
+        room: "Chem Lab"
+    },
+
+    {
+        day: "Tuesday",
+        time: "11:15 - 12:15",
+        subject: "English",
+        faculty: "Ms. Anitha",
+        room: "A104"
+    },
+
+    {
+        day: "Wednesday",
+        time: "09:00 - 10:00",
+        subject: "Basic Electrical Engineering",
+        faculty: "Mr. Arun",
+        room: "A201"
+    },
+
+    {
+        day: "Wednesday",
+        time: "10:00 - 11:00",
+        subject: "Engineering Mathematics",
+        faculty: "Dr. Kumar",
+        room: "A201"
+    },
+
+    {
+        day: "Wednesday",
+        time: "11:15 - 12:15",
+        subject: "Programming in C",
+        faculty: "Mr. Ravi",
+        room: "Computer Lab"
+    },
+
+    {
+        day: "Thursday",
+        time: "09:00 - 10:00",
+        subject: "Engineering Physics",
+        faculty: "Dr. Priya",
+        room: "A202"
+    },
+
+    {
+        day: "Thursday",
+        time: "10:00 - 11:00",
+        subject: "English",
+        faculty: "Ms. Anitha",
+        room: "A104"
+    },
+
+    {
+        day: "Thursday",
+        time: "11:15 - 12:15",
+        subject: "Engineering Chemistry",
+        faculty: "Dr. Meena",
+        room: "Chem Lab"
+    },
+
+    {
+        day: "Friday",
+        time: "09:00 - 10:00",
+        subject: "Engineering Mathematics",
+        faculty: "Dr. Kumar",
+        room: "A101"
+    },
+
+    {
+        day: "Friday",
+        time: "10:00 - 11:00",
+        subject: "Basic Electrical Engineering",
+        faculty: "Mr. Arun",
+        room: "EEE Lab"
+    },
+
+    {
+        day: "Friday",
+        time: "11:15 - 12:15",
+        subject: "Programming in C",
+        faculty: "Mr. Ravi",
+        room: "Computer Lab"
+    }
+
+];
+
+
+/* ================= HISTORY ================= */
+
+const history = [
+
+    {
+        date: "26 Sep 2026",
+        subject: "Engineering Mathematics",
+        time: "09:00",
+        status: "Present"
+    },
+
+    {
+        date: "26 Sep 2026",
+        subject: "Engineering Physics",
+        time: "10:00",
+        status: "Present"
+    },
+
+    {
+        date: "26 Sep 2026",
+        subject: "Basic Electrical Engineering",
+        time: "11:15",
+        status: "Absent"
+    },
+
+    {
+        date: "25 Sep 2026",
+        subject: "Programming in C",
+        time: "09:00",
+        status: "Present"
+    },
+
+    {
+        date: "25 Sep 2026",
+        subject: "Engineering Chemistry",
+        time: "10:00",
+        status: "Present"
+    },
+
+    {
+        date: "24 Sep 2026",
+        subject: "English",
+        time: "11:15",
+        status: "Present"
+    }
+
+];
+
+
+/* ================= CALCULATIONS ================= */
+
+function getPercentage(attended, conducted) {
+
+    if (conducted === 0) {
+        return 0;
+    }
+
+    return (attended / conducted) * 100;
+}
+
+
+/* ================= OVERALL ATTENDANCE ================= */
+
+function getOverallAttendance() {
+
+    let attended = 0;
+    let conducted = 0;
+
+    subjects.forEach(subject => {
+
+        attended += subject.attended;
+        conducted += subject.conducted;
+
+    });
+
+    return {
+        attended,
+        conducted,
+        percentage:
+            getPercentage(attended, conducted)
+    };
+}
+
+
+/* ================= SAFE ABSENCES ================= */
+
+function calculateSafeAbsences(attended, conducted) {
+
+    let absences = 0;
+
+    while (
+        getPercentage(
+            attended,
+            conducted + absences + 1
+        ) >= REQUIRED_ATTENDANCE
+    ) {
+
+        absences++;
+
+        if (absences > 100) {
+            break;
+        }
+    }
+
+    return absences;
+}
+
+
+/* ================= RECOVERY ================= */
+
+function calculateRecovery(attended, conducted) {
+
+    if (
+        getPercentage(attended, conducted)
+        >= REQUIRED_ATTENDANCE
+    ) {
+        return 0;
+    }
+
+    let classes = 0;
+
+    while (
+        getPercentage(
+            attended + classes,
+            conducted + classes
+        ) < REQUIRED_ATTENDANCE
+    ) {
+
+        classes++;
+
+        if (classes > 1000) {
+            break;
+        }
+    }
+
+    return classes;
+}
+
+
+/* ================= RISK ================= */
+
+function getRisk(percentage) {
+
+    if (percentage < 75) {
+
+        return {
+            text: "CRITICAL",
+            class: "danger"
+        };
+
+    }
+
+    if (percentage < 80) {
+
+        return {
+            text: "NEAR THRESHOLD",
+            class: "warning"
+        };
+
+    }
+
+    return {
+        text: "SAFE",
+        class: "safe"
+    };
+}
+
+
+/* ================= LOGIN ================= */
+
+function login() {
+
+    const name =
+        document.getElementById("studentName").value.trim();
+
+    const section =
+        document.getElementById("studentSection").value;
+
+    if (name === "") {
+
+        alert("Please enter your name.");
+
+        return;
+    }
+
+    student.name = name;
+    student.section = section;
+
+    document
+        .getElementById("loginPage")
+        .classList.add("hidden");
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("profileName")
+        .textContent = name;
+
+    document
+        .getElementById("profileSection")
+        .textContent = section;
+
+    document
+        .getElementById("welcomeText")
+        .textContent =
+        `Welcome back, ${name}!`;
+
+    initialize();
+}
+
+
+/* ================= LOGOUT ================= */
+
+function logout() {
+
+    document
+        .getElementById("app")
+        .classList.add("hidden");
+
+    document
+        .getElementById("loginPage")
+        .classList.remove("hidden");
+}
+
+
+/* ================= PAGE NAVIGATION ================= */
+
+function showPage(pageName) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.add("hidden");
+
+        });
+
+
+    document
+        .getElementById(pageName)
+        .classList.remove("hidden");
+
+
+    document
+        .querySelectorAll(".nav-button")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+        });
+
+
+    const buttons =
+        document.querySelectorAll(".nav-button");
+
+    const pages = [
+        "dashboard",
+        "attendance",
+        "planner",
+        "classes",
+        "timetable",
+        "history"
+    ];
+
+    const index =
+        pages.indexOf(pageName);
+
+    if (buttons[index]) {
+
+        buttons[index]
+            .classList.add("active");
+
+    }
+
+
+    const titles = {
+
+        dashboard: "Dashboard",
+
+        attendance: "Attendance",
+
+        planner: "Attendance Planner",
+
+        classes: "Upcoming Classes",
+
+        timetable: "Timetable",
+
+        history: "Attendance History"
+
+    };
+
+    document
+        .getElementById("pageTitle")
+        .textContent = titles[pageName];
+
+
+    if (pageName === "dashboard") {
+        loadDashboard();
+    }
+
+    if (pageName === "attendance") {
+        loadAttendanceCards();
+    }
+
+    if (pageName === "planner") {
+        loadPlannerSubjects();
+        updatePlanner();
+    }
+
+    if (pageName === "classes") {
+        loadUpcomingClasses();
+    }
+
+    if (pageName === "timetable") {
+        loadTimetable();
+    }
+
+    if (pageName === "history") {
+        loadHistory();
+    }
+
+}
+
+
+/* ================= DASHBOARD ================= */
+
+function loadDashboard() {
+
+    const overall =
+        getOverallAttendance();
+
+
+    document
+        .getElementById("overallAttendance")
+        .textContent =
+        overall.percentage.toFixed(1) + "%";
+
+
+    document
+        .getElementById("totalAttended")
+        .textContent =
+        overall.attended;
+
+
+    document
+        .getElementById("totalConducted")
+        .textContent =
+        overall.conducted;
+
+
+    document
+        .getElementById("safeAbsences")
+        .textContent =
+        calculateSafeAbsences(
+            overall.attended,
+            overall.conducted
+        );
+
+
+    const today =
+        new Date();
+
+    document
+        .getElementById("todayDate")
+        .textContent =
+        today.toDateString();
+
+
+    loadTodayClasses();
+
+    loadInsights();
+
+    createChart();
+
+}
+
+
+/* ================= TODAY ================= */
+
+function getTodayName() {
+
+    return new Date()
+        .toLocaleDateString(
+            "en-US",
+            { weekday: "long" }
+        );
+}
+
+
+function loadTodayClasses() {
+
+    const today =
+        getTodayName();
+
+
+    let classes =
+        timetable.filter(
+            item => item.day === today
+        );
+
+
+    /*
+       For demo purposes, if the current
+       day isn't Monday-Friday, show Monday.
+    */
+
+    if (classes.length === 0) {
+
+        classes =
+            timetable.filter(
+                item => item.day === "Monday"
+            );
+
+    }
+
+
+    const container =
+        document.getElementById("todayClasses");
+
+
+    container.innerHTML =
+        classes.map(item => `
+
+            <div class="class-item">
+
+                <div class="class-info">
+
+                    <strong>
+                        ${item.subject}
+                    </strong>
+
+                    <small>
+                        ${item.faculty} • ${item.room}
+                    </small>
+
+                </div>
+
+                <div class="class-time">
+
+                    ${item.time}
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ================= ATTENDANCE CARDS ================= */
+
+function loadAttendanceCards() {
+
+    const container =
+        document.getElementById("attendanceCards");
+
+
+    container.innerHTML =
+        subjects.map(subject => {
+
+            const percentage =
+                getPercentage(
+                    subject.attended,
+                    subject.conducted
+                );
+
+
+            const risk =
+                getRisk(percentage);
+
+
+            return `
+
+                <div class="subject-card">
+
+                    <h3>
+                        ${subject.name}
+                    </h3>
+
+                    <div class="faculty">
+                        ${subject.faculty}
+                    </div>
+
+                    <div class="attendance-number">
+                        ${percentage.toFixed(1)}%
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            style="
+                                width:${Math.min(
+                                    percentage,
+                                    100
+                                )}%;
+                                background:
+                                    ${percentage < 75
+                                    ? '#ef4444'
+                                    : percentage < 80
+                                    ? '#f59e0b'
+                                    : '#10b981'};
+                            "
+                        ></div>
+
+                    </div>
+
+                    <div class="subject-details">
+
+                        <span>
+                            ${subject.attended}
+                            /
+                            ${subject.conducted}
+                            attended
+                        </span>
+
+                        <span class="status ${risk.class}">
+                            ${risk.text}
+                        </span>
+
+                    </div>
+
+                    <div class="subject-details">
+
+                        <span>
+                            Safe absences
+                        </span>
+
+                        <strong>
+                            ${calculateSafeAbsences(
+                                subject.attended,
+                                subject.conducted
+                            )}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* ================= PLANNER SUBJECTS ================= */
+
+function loadPlannerSubjects() {
+
+    const select =
+        document.getElementById(
+            "plannerSubject"
+        );
+
+
+    select.innerHTML =
+        subjects.map(
+            (subject, index) => `
+
+                <option value="${index}">
+                    ${subject.name}
+                </option>
+
+            `
+        ).join("");
+
+}
+
+
+/* ================= PLANNER ================= */
+
+function updatePlanner() {
+
+    const subjectIndex =
+        Number(
+            document.getElementById(
+                "plannerSubject"
+            ).value
+        );
+
+
+    const numberOfClasses =
+        Number(
+            document.getElementById(
+                "plannerClasses"
+            ).value
+        );
+
+
+    const subject =
+        subjects[subjectIndex];
+
+
+    if (!subject) {
+        return;
+    }
+
+
+    const current =
+        getPercentage(
+            subject.attended,
+            subject.conducted
+        );
+
+
+    const future =
+        getPercentage(
+            subject.attended,
+            subject.conducted +
+            numberOfClasses
+        );
+
+
+    const canMiss =
+        future >= REQUIRED_ATTENDANCE;
+
+
+    const result =
+        document.getElementById(
+            "plannerResult"
+        );
+
+
+    result.innerHTML = `
+
+        <h2>
+            ${subject.name}
+        </h2>
+
+        <p>
+            Current attendance:
+            <strong>
+                ${current.toFixed(1)}%
+            </strong>
+        </p>
+
+        <div class="result-number">
+            ${future.toFixed(1)}%
+        </div>
+
+        <div class="result-message">
+
+            If you miss
+            <strong>
+                ${numberOfClasses}
+            </strong>
+            upcoming class
+            ${numberOfClasses > 1 ? "es" : ""},
+
+            your attendance becomes
+
+            <strong>
+                ${future.toFixed(1)}%
+            </strong>.
+
+        </div>
+
+        <br>
+
+        <span class="status
+            ${canMiss ? "safe" : "danger"}">
+
+            ${canMiss
+                ? "✓ SAFE"
+                : "⚠ NOT SAFE"}
+
+        </span>
+
+        <p style="margin-top:15px;color:#70798a">
+
+            Required attendance:
+            ${REQUIRED_ATTENDANCE}%
+
+        </p>
+
+    `;
+
+
+    loadRecovery(subject.name);
+
+}
+
+
+/* ================= RECOVERY ================= */
+
+function loadRecovery(subjectName) {
+
+    const subject =
+        subjects.find(
+            item => item.name === subjectName
+        );
+
+
+    if (!subject) {
+        return;
+    }
+
+
+    const current =
+        getPercentage(
+            subject.attended,
+            subject.conducted
+        );
+
+
+    const required =
+        calculateRecovery(
+            subject.attended,
+            subject.conducted
+        );
+
+
+    const container =
+        document.getElementById(
+            "recoveryResult"
+        );
+
+
+    if (current >= REQUIRED_ATTENDANCE) {
+
+        container.innerHTML = `
+
+            <div class="recovery-box">
+
+                <strong>
+                    ${subject.name}
+                </strong>
+
+                <p style="margin-top:8px">
+                    Current attendance is
+                    ${current.toFixed(1)}%.
+                    You are already above the
+                    required attendance.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML = `
+
+        <div class="recovery-box">
+
+            <strong>
+                ${subject.name}
+            </strong>
+
+            <p style="margin-top:8px">
+
+                Current attendance:
+                ${current.toFixed(1)}%
+
+            </p>
+
+            <p style="margin-top:8px">
+
+                You need to attend the next
+
+                <strong>
+                    ${required}
+                </strong>
+
+                consecutive classes
+
+                to reach at least
+                ${REQUIRED_ATTENDANCE}%.
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ================= UPCOMING CLASSES ================= */
+
+function loadUpcomingClasses() {
+
+    const container =
+        document.getElementById(
+            "upcomingClasses"
+        );
+
+
+    container.innerHTML =
+        timetable.map(item => `
+
+            <div class="class-item">
+
+                <div class="class-info">
+
+                    <strong>
+                        ${item.subject}
+                    </strong>
+
+                    <small>
+                        ${item.day}
+                        •
+                        ${item.faculty}
+                        •
+                        ${item.room}
+                    </small>
+
+                </div>
+
+                <div class="class-time">
+
+                    ${item.time}
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ================= TIMETABLE ================= */
+
+function loadTimetable() {
+
+    const body =
+        document.getElementById(
+            "timetableBody"
+        );
+
+
+    body.innerHTML =
+        timetable.map(item => `
+
+            <tr>
+
+                <td>
+                    <strong>
+                        ${item.day}
+                    </strong>
+                </td>
+
+                <td>
+                    ${item.time}
+                </td>
+
+                <td>
+                    ${item.subject}
+                </td>
+
+                <td>
+                    ${item.faculty}
+                </td>
+
+                <td>
+                    ${item.room}
+                </td>
+
+            </tr>
+
+        `).join("");
+
+}
+
+
+/* ================= HISTORY ================= */
+
+function loadHistory() {
+
+    const body =
+        document.getElementById(
+            "historyBody"
+        );
+
+
+    body.innerHTML =
+        history.map(item => `
+
+            <tr>
+
+                <td>
+                    ${item.date}
+                </td>
+
+                <td>
+                    ${item.subject}
+                </td>
+
+                <td>
+                    ${item
