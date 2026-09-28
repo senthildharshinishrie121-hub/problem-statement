@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart-Search Floor Manager</title>
+
+<style>
+
+/* ===============================
+   GENERAL
+================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+    min-height: 100vh;
+}
+
+
+/* ===============================
+   HEADER
+================================ */
+
+header {
+    background: linear-gradient(
+        135deg,
+        #172554,
+        #2563eb,
+        #4f46e5
+    );
+
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+header h1 {
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+
+/* ===============================
+   MAIN
+================================ */
+
+main {
+    width: 92%;
+    max-width: 1150px;
+    margin: 30px auto;
+}
+
+
+/* ===============================
+   CARD
+================================ */
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+}
+
+
+/* ===============================
+   AI SEARCH
+================================ */
+
+.ai-card {
+    border: 2px solid #6366f1;
+}
+
+.ai-description {
+    color: #667085;
+    margin-bottom: 18px;
+}
+
+
+/* ===============================
+   SEARCH BOX
+================================ */
+
+.search-box {
+    display: flex;
+    gap: 10px;
+}
+
+.search-box input {
+    flex: 1;
+
+    padding: 15px;
+
+    border: 2px solid #dbe2f0;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: #4f46e5;
+}
+
+
+/* ===============================
+   BUTTON
+================================ */
+
+button {
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 14px 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #2563eb
+        );
+
+    color: white;
+
+    font-weight: bold;
+
+    font-size: 15px;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+
+/* ===============================
+   EXAMPLES
+================================ */
+
+.examples {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.example-button {
+    background: #eef2ff;
+    color: #3730a3;
+    padding: 9px 13px;
+    font-size: 13px;
+}
+
+
+/* ===============================
+   NORMAL SEARCH
+================================ */
+
+.filters {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    align-items: end;
+}
+
+label {
+    display: block;
+
+    font-weight: bold;
+
+    margin-bottom: 7px;
+}
+
+select,
+input[type="time"] {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border:
+        2px solid #dbe2f0;
+
+    border-radius: 9px;
+
+    background: white;
+
+    font-size: 15px;
+}
+
+
+/* ===============================
+   RESULTS
+================================ */
+
+.result-header {
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.result-message {
+    color: #667085;
+    margin-top: 5px;
+}
+
+.room-count {
+    background: #e8f7ee;
+
+    color: #16803c;
+
+    padding: 10px 15px;
+
+    border-radius: 20px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* ===============================
+   FLOOR
+================================ */
+
+.floor-section {
+    margin-top: 25px;
+}
+
+.floor-title {
+    background:
+        linear-gradient(
+            135deg,
+            #eef2ff,
+            #f4f6ff
+        );
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    margin-bottom: 15px;
+}
+
+.floor-title h3 {
+    color: #273472;
+}
+
+
+/* ===============================
+   ROOM GRID
+================================ */
+
+.room-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 15px;
+}
+
+
+/* ===============================
+   ROOM
+================================ */
+
+.room {
+    background: white;
+
+    border:
+        2px solid #e1e6ef;
+
+    border-radius: 14px;
+
+    padding: 18px;
+}
+
+.room:hover {
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,0.08);
+}
+
+.room.available {
+    border-left:
+        6px solid #16a34a;
+}
+
+.room.occupied {
+    border-left:
+        6px solid #dc2626;
+
+    background: #fffafa;
+
+    opacity: 0.75;
+}
+
+.room h3 {
+    margin-bottom: 10px;
+}
+
+.room p {
+    margin: 6px 0;
+    color: #596579;
+}
+
+
+/* ===============================
+   STATUS
+================================ */
+
+.status {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.room.available .status {
+    background: #e7f7ed;
+    color: #15803d;
+}
+
+.room.occupied .status {
+    background: #feecec;
+    color: #b91c1c;
+}
+
+
+/* ===============================
+   DATASET
+================================ */
+
+.dataset-row {
+    padding: 12px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.dataset-row:last-child {
+    border-bottom: none;
+}
+
+
+/* ===============================
+   NO RESULT
+================================ */
+
+.no-result {
+    text-align: center;
+
+    padding: 35px;
+
+    color: #667085;
+}
+
+.no-result h3 {
+    margin-bottom: 8px;
+}
+
+
+/* ===============================
+   FOOTER
+================================ */
+
+footer {
+    text-align: center;
+
+    padding: 30px 15px;
+
+    color: #667085;
+}
+
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media(max-width:700px) {
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .search-box {
+        flex-direction: column;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .result-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .room-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =================================
+     HEADER
+================================= -->
+
+<header>
+
+    <h1>
+        🏢 Smart-Search Floor Manager
+    </h1>
+
+    <p>
+        Find Empty Classrooms Quickly
+        Using Timetable Data
+    </p>
+
+</header>
+
+
+
+<main>
+
+
+<!-- =================================
+     AI ROOM FINDER
+================================= -->
+
+<section class="card ai-card">
+
+    <h2>
+        🤖 AI Room Finder
+    </h2>
+
+    <p class="ai-description">
+        Type what you need in normal language.
+        The system will understand your request
+        and find matching rooms.
+    </p>
+
+
+    <div class="search-box">
+
+        <input
+            id="smartSearch"
+            type="text"
+            placeholder="Example: I need an AC room on ground floor at 10 AM"
+        >
+
+        <button onclick="smartSearch()">
+            🔍 Find Room
+        </button>
+
+    </div>
+
+
+    <div class="examples">
+
+        <button
+            class="example-button"
+            onclick="exampleSearch(
+                'I need an AC room on ground floor at 10 AM'
+            )"
+        >
+            ❄️ AC + Ground
+        </button>
+
+
+        <button
+            class="example-button"
+            onclick="exampleSearch(
+                'I need a room on first floor at 11 AM'
+            )"
+        >
+            🏢 First Floor
+        </button>
+
+
+        <button
+            class="example-button"
+            onclick="exampleSearch(
+                'I need a non AC room at 2 PM'
+            )"
+        >
+            🌬️ Non-AC
+        </button>
+
+
+        <button
+            class="example-button"
+            onclick="exampleSearch(
+                'I need an AC room on second floor at 9 AM'
+            )"
+        >
+            ❄️ AC + Second
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- =================================
+     NORMAL SEARCH
+================================= -->
+
+<section class="card">
+
+    <h2>
+        🔎 Normal Room Search
+    </h2>
+
+
+    <div class="filters">
+
+
+        <div>
+
+            <label>
+                Floor
+            </label>
+
+            <select id="floorFilter">
+
+                <option value="all">
+                    All Floors
+                </option>
+
+                <option value="Ground">
+                    Ground Floor
+                </option>
+
+                <option value="First">
+                    First Floor
+                </option>
+
+                <option value="Second">
+                    Second Floor
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <div>
+
+            <label>
+                Room Type
+            </label>
+
+            <select id="typeFilter">
+
+                <option value="all">
+                    All Rooms
+                </option>
+
+                <option value="AC">
+                    AC
+                </option>
+
+                <option value="Non-AC">
+                    Non-AC
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <div>
+
+            <label>
+                Time
+            </label>
+
+            <input
+                id="timeFilter"
+                type="time"
+                value="10:00"
+            >
+
+        </div>
+
+
+
+        <button onclick="normalSearch()">
+            Search
+        </button>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =================================
+     ROOM RESULTS
+================================= -->
+
+<section class="card">
+
+    <div class="result-header">
+
+        <div>
+
+            <h2>
+                🏫 Available Rooms
+            </h2>
+
+            <p
+                id="resultMessage"
+                class="result-message"
+            >
+                Showing available rooms at 10:00
+            </p>
+
+        </div>
+
+
+        <div
+            id="roomCount"
+            class="room-count"
+        >
+            0 Available
+        </div>
+
+    </div>
+
+
+    <div id="roomsContainer">
+
+    </div>
+
+</section>
+
+
+
+<!-- =================================
+     DATASET
+================================= -->
+
+<section class="card">
+
+    <h2>
+        📊 Timetable Dataset
+    </h2>
+
+    <p
+        style="
+        color:#667085;
+        margin:10px 0 15px;
+        "
+    >
+        Current demo dataset contains
+        10 class sections.
+    </p>
+
+
+    <div id="datasetContainer">
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- =================================
+     FOOTER
+================================= -->
+
+<footer>
+
+    <p>
+        Smart-Search Floor Manager
+    </p>
+
+    <p>
+        Phase 1 • Smart Classroom Finder
+    </p>
+
+</footer>
+
+
+
+<script>
+
+
+/* =================================
+   ROOM DATABASE
+================================= */
+
+const rooms = [
+
+    {
+        room: "G001",
+        floor: "Ground",
+        type: "AC",
+        capacity: 60
+    },
+
+    {
+        room: "G002",
+        floor: "Ground",
+        type: "Non-AC",
+        capacity: 50
+    },
+
+    {
+        room: "G003",
+        floor: "Ground",
+        type: "AC",
+        capacity: 40
+    },
+
+    {
+        room: "G004",
+        floor: "Ground",
+        type: "Non-AC",
+        capacity: 40
+    },
+
+
+    {
+        room: "F101",
+        floor: "First",
+        type: "AC",
+        capacity: 60
+    },
+
+    {
+        room: "F102",
+        floor: "First",
+        type: "Non-AC",
+        capacity: 50
+    },
+
+    {
+        room: "F103",
+        floor: "First",
+        type: "AC",
+        capacity: 40
+    },
+
+    {
+        room: "F104",
+        floor: "First",
+        type: "Non-AC",
+        capacity: 40
+    },
+
+
+    {
+        room: "S201",
+        floor: "Second",
+        type: "AC",
+        capacity: 60
+    },
+
+    {
+        room: "S202",
+        floor: "Second",
+        type: "Non-AC",
+        capacity: 50
+    },
+
+    {
+        room: "S203",
+        floor: "Second",
+        type: "AC",
+        capacity: 40
+    },
+
+    {
+        room: "S204",
+        floor: "Second",
+        type: "Non-AC",
+        capacity: 40
+    }
+
+];
+
+
+
+/* =================================
+   TIMETABLE DATA
+   10 CLASS SECTIONS
+================================= */
+
+const timetable = [
+
+    {
+        section: "EEE-A",
+        room: "G001",
+        start: "09:00",
+        end: "10:00"
+    },
+
+    {
+        section: "EEE-B",
+        room: "G003",
+        start: "10:00",
+        end: "11:00"
+    },
+
+    {
+        section: "ECE-A",
+        room: "F101",
+        start: "09:00",
+        end: "10:00"
+    },
+
+    {
+        section: "ECE-B",
+        room: "F103",
+        start: "11:00",
+        end: "12:00"
+    },
+
+    {
+        section: "CSE-A",
+        room: "S201",
+        start: "09:00",
+        end: "10:00"
+    },
+
+    {
+        section: "CSE-B",
+        room: "S203",
+        start: "10:00",
+        end: "11:00"
+    },
+
+    {
+        section: "MECH-A",
+        room: "G002",
+        start: "11:00",
+        end: "12:00"
+    },
+
+    {
+        section: "CIVIL-A",
+        room: "F102",
+        start: "12:00",
+        end: "13:00"
+    },
+
+    {
+        section: "IT-A",
+        room: "S202",
+        start: "13:00",
+        end: "14:00"
+    },
+
+    {
+        section: "AIDS-A",
+        room: "G004",
+        start: "14:00",
+        end: "15:00"
+    }
+
+];
+
+
+
+/* =================================
+   CONVERT TIME TO MINUTES
+================================= */
+
+function timeToMinutes(time) {
+
+    const parts = time.split(":");
+
+    const hours = Number(parts[0]);
+
+    const minutes = Number(parts[1]);
+
+    return hours * 60 + minutes;
+
+}
+
+
+
+/* =================================
+   CHECK ROOM AVAILABILITY
+================================= */
+
+function isOccupied(roomNumber, time) {
+
+    const currentTime =
+        timeToMinutes(time);
+
+
+    return timetable.some(item => {
+
+        if (item.room !== roomNumber) {
+
+            return false;
+
+        }
+
+
+        const start =
+            timeToMinutes(item.start);
+
+
+        const end =
+            timeToMinutes(item.end);
+
+
+        return (
+            currentTime >= start &&
+            currentTime < end
+        );
+
+    });
+
+}
+
+
+
+/* =================================
+   DISPLAY ROOMS
+================================= */
+
+function displayRooms(roomList, time) {
+
+    const container =
+        document.getElementById(
+            "roomsContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let availableCount = 0;
+
+
+    const floors = [
+        "Ground",
+        "First",
+        "Second"
+    ];
+
+
+    floors.forEach(floor => {
+
+
+        const floorRooms =
+            roomList.filter(
+                room =>
+                    room.floor === floor
+            );
+
+
+        if (floorRooms.length === 0) {
+
+            return;
+
+        }
+
+
+        const floorSection =
+            document.createElement(
+                "div"
+            );
+
+
+        floorSection.className =
+            "floor-section";
+
+
+        floorSection.innerHTML = `
+
+            <div class="floor-title">
+
+                <h3>
+                    🏢 ${floor} Floor
+                </h3>
+
+            </div>
+
+            <div class="room-grid"></div>
+
+        `;
+
+
+        const grid =
+            floorSection.querySelector(
+                ".room-grid"
+            );
+
+
+        floorRooms.forEach(room => {
+
+
+            const occupied =
+                isOccupied(
+                    room.room,
+                    time
+                );
+
+
+            if (!occupied) {
+
+                availableCount++;
+
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                occupied
+                ? "room occupied"
+                : "room available";
+
+
+            card.innerHTML = `
+
+                <h3>
+                    Room ${room.room}
+                </h3>
+
+                <p>
+                    ❄️ Type:
+                    ${room.type}
+                </p>
+
+                <p>
+                    👥 Capacity:
+                    ${room.capacity}
+                </p>
+
+                <p>
+                    🕐 Checked at:
+                    ${time}
+                </p>
+
+                <span class="status">
+
+                    ${
+                        occupied
+                        ? "🔴 Occupied"
+                        : "🟢 Available"
+                    }
+
+                </span>
+
+            `;
+
+
+            grid.appendChild(card);
+
+        });
+
+
+        container.appendChild(
+            floorSection
+        );
+
+    });
+
+
+    if (availableCount === 0) {
+
+        container.innerHTML = `
+
+            <div class="no-result">
+
+                <h3>
+                    😔 No Available Rooms
+                </h3>
+
+                <p>
+                    Try another time
+                    or different requirements.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+
+    document.getElementById(
+        "roomCount"
+    ).textContent =
+        `${availableCount} Available`;
+
+}
+
+
+
+/* =================================
+   NORMAL SEARCH
+================================= */
+
+function normalSearch() {
+
+
+    const floor =
+        document.getElementById(
+            "floorFilter"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "typeFilter"
+        ).value;
+
+
+    const time =
+        document.getElementById(
+            "timeFilter"
+        ).value;
+
+
+    let result =
+        [...rooms];
+
+
+    if (floor !== "all") {
+
+        result =
+            result.filter(
+                room =>
+                    room.floor === floor
+            );
+
+    }
+
+
+    if (type !== "all") {
+
+        result =
+            result.filter(
+                room =>
+                    room.type === type
+            );
+
+    }
+
+
+    displayRooms(
+        result,
+        time
+    );
+
+
+    document.getElementById(
+        "resultMessage"
+    ).textContent =
+        `Rooms checked at ${time}`;
+
+}
+
+
+
+/* =================================
+   SMART TEXT SEARCH
+================================= */
+
+function smartSearch() {
+
+
+    const input =
+        document.getElementById(
+            "smartSearch"
+        );
+
+
+    const text =
+        input.value
+        .toLowerCase()
+        .trim();
+
+
+    if (text === "") {
+
+        alert(
+            "Please describe the room you need."
+        );
+
+        return;
+
+    }
+
+
+    let result =
+        [...rooms];
+
+
+    /* -----------------------------
+       FLOOR DETECTION
+    ----------------------------- */
+
+    if (
+        text.includes("ground floor") ||
+        text.includes("ground")
+    ) {
+
+        result =
+            result.filter(
+                room =>
+                    room.floor === "Ground"
+            );
+
+    }
+
+    else if (
+        text.includes("first floor") ||
+        text.includes("first")
+    ) {
+
+        result =
+            result.filter(
+                room =>
+                    room.floor === "First"
+            );
+
+    }
+
+    else if (
+        text.includes("second floor") ||
+        text.includes("second")
+    ) {
+
+        result =
+            result.filter(
+                room =>
+                    room.floor === "Second"
+            );
+
+    }
+
+
+    /* -----------------------------
+       AC DETECTION
+    ----------------------------- */
+
+    const wantsNonAC =
+        text.includes("non ac") ||
+        text.includes("non-ac");
+
+
+    const wantsAC =
+        !wantsNonAC &&
+        (
+            text.includes("ac") ||
+            text.includes("air conditioner") ||
+            text.includes("air conditioned")
+        );
+
+
+    if (wantsAC) {
+
+        result =
+            result.filter(
+                room =>
+                    room.type === "AC"
+            );
+
+    }
+
+
+    if (wantsNonAC) {
+
+        result =
+            result.filter(
+                room =>
+                    room.type === "Non-AC"
+            );
+
+    }
+
+
+    /* -----------------------------
+       TIME DETECTION
+    ----------------------------- */
+
+    let detectedTime =
+        "10:00";
+
+
+    const timeMatch =
+        text.match(
+            /(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/
+        );
+
+
+    if (timeMatch) {
+
+
+        let hour =
+            Number(
+                timeMatch[1]
+            );
+
+
+        let minute =
+            timeMatch[2]
+            ? Number(
+                timeMatch[2]
+            )
+            : 0;
+
+
+        const period =
+            timeMatch[3];
+
+
+        if (
+            period === "pm" &&
+            hour < 12
+        ) {
+
+            hour += 12;
+
+        }
+
+
+        if (
+            period === "am" &&
+            hour === 12
+        ) {
+
+            hour = 0;
+
+        }
+
+
+        detectedTime =
+            String(hour)
+            .padStart(2, "0")
+            +
+            ":"
+            +
+            String(minute)
+            .padStart(2, "0");
+
+    }
+
+
+    /* -----------------------------
+       SHOW RESULTS
+    ----------------------------- */
+
+    displayRooms(
+        result,
+        detectedTime
+    );
+
+
+    document.getElementById(
+        "resultMessage"
+    ).textContent =
+        `🤖 Smart search understood:
+        "${text}"`;
+
+}
+
+
+
+/* =================================
+   EXAMPLE SEARCH
+================================= */
+
+function exampleSearch(text) {
+
+    document.getElementById(
+        "smartSearch"
+    ).value = text;
+
+
+    smartSearch();
+
+}
+
+
+
+/* =================================
+   SHOW DATASET
+================================= */
+
+function showDataset() {
+
+
+    const container =
+        document.getElementById(
+            "datasetContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    timetable.forEach(item => {
+
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.className =
+            "dataset-row";
+
+
+        row.innerHTML = `
+
+            <b>
+                ${item.section}
+            </b>
+
+            →
+
+            Room ${item.room}
+
+            |
+
+            ${item.start}
+
+            -
+
+            ${item.end}
+
+        `;
+
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+
+/* =================================
+   START WEBSITE
+================================= */
+
+window.onload = function() {
+
+
+    displayRooms(
+        rooms,
+        "10:00"
+    );
+
+
+    showDataset();
+
+};
+
+
+</script>
+
+
+</body>
+
+</html>
